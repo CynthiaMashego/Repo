@@ -50,8 +50,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AssessmentFileProcessorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PersonProcessorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FileProcessor\AssessmentFileProcessor.csproj">

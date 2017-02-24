@@ -9,13 +9,52 @@ namespace AssessmentFileProcessor
 {
     public static class PersonProcessor
     {
+        /// <summary>
+        /// Orders person by address - street name
+        /// </summary>
+        /// <param name="persons"></param>
+        /// <returns></returns>
+        public static List<string> PersonsAddresses_OrderbyStreetName(List<Person> persons)
+        {
+            var newList =
+                  persons.OrderBy(p => p.Address.StreetName)
+                      .Select(p => new { p.Address.StreetNumber, p.Address.StreetName });
+            return newList.Select(item => item.StreetNumber + " " + item.StreetName).ToList();
+        }
+        /// <summary>
+        /// Order person frequency(desc) of names( first and last) then by alphabetically (asc)
+        /// </summary>
+        /// <param name="persons"></param>
+        /// <returns></returns>
+
+        public static Dictionary<string, int> PersonNameFrequency(List<Person> persons)
+        {
+            var names = new List<Row>();
+            foreach (var person in persons)
+            {
+                names.Add(new Row() { LineText = person.FirstName });
+                names.Add(new Row() { LineText = person.LastName });
+            }
+            var newList = names.GroupBy(n => n.LineText)
+                .OrderByDescending(n => n.Count())
+                .ThenBy(n => n.Key)
+                .Select(n => new { LineText = n.Key, Count = n.Count() }).ToList();
+
+            return newList.ToDictionary(item => item.LineText, item => item.Count);
+        }
+
+        /// <summary>
+        /// create person object
+        /// </summary>
+        /// <param name="rows"></param>
+        /// <returns></returns>
         public static List<Person> GetPersonList(List<Row> rows)
         {
-            List<Person> persons = new List<Person>();
+            var persons = new List<Person>();
             foreach (var row in rows)
             {
-              Person person = new Person();
-                for (int i =0 ; i < row.Count; i++)
+                var person = new Person();
+                for (var i = 0; i < row.Count; i++)
                 {
                     if (i.Equals(0))
                         person.FirstName = row[i];
@@ -23,20 +62,19 @@ namespace AssessmentFileProcessor
                         person.LastName = row[i];
                     else if (i.Equals(2))
                     {
-                        string originalAddress = row[i];
-                        Address address = new Address();
-                        int startPos = originalAddress.IndexOf(" ", StringComparison.CurrentCultureIgnoreCase);
-                        int length = originalAddress.Length;
-                        string streetname = originalAddress.Substring(startPos);
+                        var originalAddress = row[i];
+                        var address = new Address();
+                        var startPos = originalAddress.IndexOf(" ", StringComparison.CurrentCultureIgnoreCase);
+                        var streetname = originalAddress.Substring(startPos);
                         originalAddress = originalAddress.Remove(startPos);
-                        string streetnumber = originalAddress.Substring(0);
+                        var streetnumber = originalAddress.Substring(0);
                         address.StreetName = streetname;
-                        address.StreetNumber = Int32.Parse(streetnumber);
+                        address.StreetNumber = int.Parse(streetnumber);
                         person.Address = address;
                     }
-                    else 
+                    else
                     {
-                        person.PhoneNumber = Int32.Parse(row[i]);
+                        person.PhoneNumber = int.Parse(row[i]);
                     }
 
                 }
@@ -46,15 +84,25 @@ namespace AssessmentFileProcessor
             return persons;
         }
 
+        /// <summary>
+        /// Order by frequency(desc) then first name
+        /// </summary>
+        /// <param name="persons"></param>
+        /// <returns></returns>
         public static Dictionary<string, int> PersonsFirstNameFrequency(List<Person> persons)
         {
-            var newList =  persons.GroupBy(p => p.FirstName)
+            var newList = persons.GroupBy(p => p.FirstName)
                 .OrderByDescending(p => p.Count())
                 .ThenBy(p => p.Key)
-                .Select(p => new {FirstName = p.Key, Count = p.Count()});
+                .Select(p => new { FirstName = p.Key, Count = p.Count() });
             return newList.ToDictionary(item => item.FirstName, item => item.Count);
         }
 
+        /// <summary>
+        /// Order by frequency(desc) then last name
+        /// </summary>
+        /// <param name="persons"></param>
+        /// <returns></returns>
         public static Dictionary<string, int> PersonsLastNameFrequency(List<Person> persons)
         {
             var newList = persons.GroupBy(p => p.LastName)
@@ -63,14 +111,7 @@ namespace AssessmentFileProcessor
                   .Select(p => new { LastName = p.Key, Count = p.Count() }).ToList();
             return newList.ToDictionary(item => item.LastName, item => item.Count);
         }
-
-        public static List<string> PersonsAddresses(List<Person> persons)
-        {
-          var newList =
-                persons.OrderBy(p => p.Address.StreetName)
-                    .Select(p => new {p.Address.StreetNumber, p.Address.StreetName});
-           return newList.Select(item => item.StreetNumber + " " + item.StreetName).ToList();
-        }
+        
 
     }
 }

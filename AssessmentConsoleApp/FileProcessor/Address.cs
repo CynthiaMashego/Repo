@@ -10,6 +10,11 @@ namespace AssessmentFileProcessor
     {
        public int StreetNumber { get; set; }
 
-       public string StreetName { get; set; } 
+       public string StreetName { get; set; }
+
+       public override string ToString()
+       {
+           return StreetNumber + " " + StreetName;
+       }
     }
 }
